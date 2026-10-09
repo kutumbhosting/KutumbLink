@@ -1,0 +1,14 @@
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import DonateDialog from "@/components/DonateDialog";
+
+export default function FundraiserPage() {
+  const { slug } = useParams(); const [page,setPage]=useState<any>(null); const [error,setError]=useState(""); const [donating,setDonating]=useState(false);
+  useEffect(()=>{fetch(`/api/fundraising/pages/${encodeURIComponent(slug||"")}`).then(async r=>{const b=await r.json();if(!r.ok)throw new Error(b.message||"Fundraiser unavailable");return b;}).then(setPage).catch(e=>setError(e.message));},[slug]);
+  if(error)return <main className="mx-auto max-w-2xl px-5 py-20 text-center"><h1 className="text-3xl font-semibold">Fundraiser unavailable</h1><p className="my-4 text-muted-foreground">{error}</p><Button asChild><Link to="/fundraising">Browse fundraising</Link></Button></main>;
+  if(!page)return <main className="p-16 text-center text-muted-foreground">Loading fundraiser…</main>;
+  const raised=Number(page.raised_amount||0); const goal=Number(page.goal_amount||0); const pct=goal?Math.min(100,Math.round(raised/goal*100)):0;
+  return <main className="min-h-screen bg-muted/20"><header className="border-b bg-background"><div className="mx-auto max-w-3xl px-5 py-4"><Link to="/" className="font-semibold">KutumbLink</Link></div></header><div className="mx-auto max-w-3xl px-5 py-10"><Card><CardContent className="p-6 md:p-10"><p className="text-sm text-muted-foreground">Fundraising for <Link className="underline" to={`/fundraising/campaigns/${page.campaign_slug}`}>{page.campaign_title}</Link></p><h1 className="mt-2 text-3xl font-bold">{page.title}</h1><p className="mt-2 text-muted-foreground">Started by {page.display_name} · {page.public_name||page.legal_name}</p><p className="mt-6 whitespace-pre-wrap leading-7">{page.story||"Join me in supporting this cause."}</p><div className="mt-8 rounded-lg bg-muted/50 p-5"><p className="text-3xl font-bold">${raised.toLocaleString()} AUD raised</p>{goal>0&&<><p className="mt-1 text-sm text-muted-foreground">of ${goal.toLocaleString()} goal</p><div className="mt-3 h-2 rounded-full bg-background"><div className="h-full rounded-full bg-primary" style={{width:`${pct}%`}}/></div></>}{page.internal_giving_enabled?<Button className="mt-5 w-full sm:w-auto" onClick={()=>setDonating(true)}>Donate to {page.display_name}’s fundraiser</Button>:<p className="mt-4 text-sm text-muted-foreground">Online giving for this charity is not enabled. Visit the campaign page for its external giving link.</p>}</div></CardContent></Card></div>{page.internal_giving_enabled&&<DonateDialog open={donating} onOpenChange={setDonating} organisationId={Number(page.organisation_id)} campaignId={page.campaign_id?Number(page.campaign_id):undefined} eventId={page.event_id||undefined} fundraisingPageId={Number(page.id)}/>}</main>;
+}
