@@ -174,22 +174,24 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/privacy-policy"
+                  to="/privacy"
                   onClick={() => window.scrollTo(0, 0)}
                   className="text-muted-foreground hover:text-primary transition-colors text-sm"
                 >
-                  Privacy &amp; Data Security Policy
+                  Privacy and cookie policy
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/event-terms"
+                  to="/terms"
                   onClick={() => window.scrollTo(0, 0)}
                   className="text-muted-foreground hover:text-primary transition-colors text-sm"
                 >
-                  Event Terms &amp; Liability
+                  Terms of use
                 </Link>
               </li>
+              <li><Link to="/organiser-terms" onClick={() => window.scrollTo(0, 0)} className="text-muted-foreground hover:text-primary transition-colors text-sm">Organiser terms</Link></li>
+              <li><Link to="/privacy-choices" onClick={() => window.scrollTo(0, 0)} className="text-muted-foreground hover:text-primary transition-colors text-sm">Your privacy choices</Link></li>
             </ul>
           </div>
 
@@ -219,20 +221,24 @@ const Footer = () => {
             <p>© Kutumb Australia, {currentYear}. All rights reserved.</p>
             <div className="flex items-center gap-4">
               <Link
-                to="/privacy-policy"
+                to="/privacy"
                 onClick={() => window.scrollTo(0, 0)}
                 className="hover:text-primary transition-colors"
               >
-                Privacy Policy
+                Privacy and cookie policy
               </Link>
               <span className="text-border">|</span>
               <Link
-                to="/event-terms"
+                to="/terms"
                 onClick={() => window.scrollTo(0, 0)}
                 className="hover:text-primary transition-colors"
               >
-                Event Terms
+                Terms of use
               </Link>
+              <span className="text-border">|</span>
+              <Link to="/organiser-terms" onClick={() => window.scrollTo(0, 0)} className="hover:text-primary transition-colors">Organiser terms</Link>
+              <span className="text-border">|</span>
+              <Link to="/privacy-choices" onClick={() => window.scrollTo(0, 0)} className="hover:text-primary transition-colors">Your privacy choices</Link>
             </div>
 <p>
   Website developed by{" "}
@@ -305,7 +311,6 @@ const Footer = () => {
 };
 
 export default Footer;
-
 
 
 

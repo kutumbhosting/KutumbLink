@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 export type LegalSection = { title: string; body: ReactNode };
 export type LegalDoc = { title: string; intro: string; sections: LegalSection[] };
 
-export const LEGAL_UPDATED = "8 October 2026";
+export const LEGAL_UPDATED = "9 October 2026";
 export const LEGAL_EMAIL = "support@kutumblink.com.au";
 
 const P = ({ children }: { children: ReactNode }) => <p className="mb-3">{children}</p>;
@@ -139,20 +139,20 @@ export const TERMS: LegalDoc = {
 };
 
 export const PRIVACY: LegalDoc = {
-  title: "Privacy policy",
+  title: "Privacy and cookie policy",
   intro:
-    "We take your privacy seriously. This policy explains what personal information KutumbLink collects, why we collect it, who we share it with and the choices you have. We handle personal information in line with the Privacy Act 1988 (Cth) and the Australian Privacy Principles.",
+    "This policy explains how KutumbLink handles personal information when you browse the site, register for an event, donate, fundraise, manage an organisation or contact us. Organisers may also collect information for their own purposes; please read their privacy notice for those activities. Where the Privacy Act 1988 (Cth) applies, we handle personal information under the Australian Privacy Principles.",
   sections: [
     {
       title: "1. Information we collect",
       body: (<>
         <UL items={[
-          <><strong>Account details</strong>: first and last name, email address, mobile number, region, state, organisation name, legal name and ABN, and an encrypted password.</>,
-          <><strong>Event and ticket information</strong>: names, email addresses, phone numbers, ticket types, attendee details and any accessibility or dietary needs you choose to share.</>,
-          <><strong>Donation and fundraising information</strong>: donation amounts, dedication messages and receipt details.</>,
-          <><strong>Payment information</strong>: handled by our payment providers. We receive confirmation, a reference and the last digits of a card, but not full card numbers.</>,
-          <><strong>Technical information</strong>: device, browser, IP address, pages viewed and approximate location, collected through cookies and similar technologies.</>,
-          <><strong>Communications</strong>: messages you send to us or through the Platform.</>,
+          <><strong>Account and organisation details</strong>: your name, email, phone, organisation details and information needed to authenticate or review an organisation.</>,
+          <><strong>Event and supporter details</strong>: registration, attendee, membership, volunteer, donation and fundraising records, including information you choose to provide. Organisers decide which optional details they request.</>,
+          <><strong>Payment details</strong>: payments are handled by the payment provider shown at checkout. KutumbLink receives transaction status and references needed to support the service; the provider handles card credentials.</>,
+          <><strong>Platform activity</strong>: event-page views and campaign source information may be recorded for event reporting. If an organiser sends an email campaign through KutumbLink, delivery status and campaign open or link-click activity may be recorded for campaign reporting.</>,
+          <><strong>Technical and contact information</strong>: requests to the website may include browser, device, network and timestamp details processed by the platform and its hosting services. We also keep communications and preference records you provide.</>,
+          <><strong>Optional location lookup</strong>: if you choose “Use my location”, your browser asks for permission and sends your approximate device coordinates to KutumbLink. We forward them to our configured reverse-geocoding service (OpenStreetMap Nominatim by default) to identify a nearby suburb or city. We briefly cache a rounded location lookup to limit repeat requests; we do not save your precise coordinates as a profile or event record. The <a className="underline" href="https://osmfoundation.org/wiki/Privacy_Policy">OpenStreetMap privacy policy</a> applies when its service is used.</>,
         ]} />
       </>),
     },
@@ -165,8 +165,9 @@ export const PRIVACY: LegalDoc = {
           "to send confirmations, tickets, receipts and important service messages;",
           "to help organisers run their events and communicate with their attendees and supporters;",
           "to prevent fraud and misuse, keep the Platform secure and meet legal obligations;",
-          "to understand how the Platform is used and improve it;",
-          "to send news and recommendations, where you have opted in. You can unsubscribe at any time.",
+          "to operate and secure the service, troubleshoot issues and measure event or email campaign activity;",
+          "when you request it, to identify a nearby area for event discovery;",
+          "to send marketing only where permitted and where you have consented. You can opt out of marketing at any time.",
         ]} />
       </>),
     },
@@ -174,28 +175,32 @@ export const PRIVACY: LegalDoc = {
       title: "3. Who we share it with",
       body: (<>
         <P><strong>Organisers.</strong> When you buy a ticket, register or donate, we share the necessary details (such as your name, email and ticket or donation information) with the organiser or charity running the event or campaign. They are responsible for handling it in line with privacy law and their own privacy policy.</P>
-        <P><strong>Service providers.</strong> We use trusted providers for payments, hosting, email and SMS delivery, analytics and fraud prevention. They may only use your information to provide services to us.</P>
+        <P><strong>Service providers.</strong> We share relevant information with providers that support hosting, payment processing, email and SMS delivery, identity checks and platform security. We do not currently use third-party advertising or analytics cookies.</P>
         <P><strong>Legal and safety.</strong> We may disclose information where required by law or to protect people, property or the integrity of the Platform.</P>
         <P>We do not sell your personal information.</P>
       </>),
     },
     {
       title: "4. Overseas disclosure",
-      body: (<P>Some of our providers store or process data outside Australia, for example in the United States. Where we send information overseas, we take reasonable steps to make sure it is handled in line with the Australian Privacy Principles.</P>),
+      body: (<P>Some service providers may store or process information outside Australia, depending on the provider and the service configuration. Where the Privacy Act applies and personal information is disclosed to an overseas recipient, we take steps required by applicable Australian privacy law.</P>),
     },
     {
-      title: "5. Cookies",
-      body: (<P>We use cookies that are necessary for sign-in and security, plus analytics cookies that help us understand usage. You can control cookies in your browser settings, but some parts of the Platform may not work without the necessary ones.</P>),
+      title: "5. Cookies and similar technologies",
+      body: (<>
+        <P>This release uses first-party cookies for essential functions: administrator and supporter sign-in sessions, and a preference that remembers the state of an interface panel. The sign-in cookies are httpOnly and are not available to page scripts. Blocking or clearing them can sign you out or affect a saved interface preference.</P>
+        <P>We do not currently set advertising or third-party analytics cookies. Event-page measurement and, when an organiser sends a campaign, email open and link-click reporting are described above; these features do not rely on an advertising cookie. A payment provider may use its own technologies on its checkout pages under that provider’s notices.</P>
+        <P>You can block or clear cookies in your browser settings. See <a className="underline" href="/privacy-choices">Your privacy choices</a> for the available controls and preference links.</P>
+      </>),
     },
     {
       title: "6. Security and retention",
       body: (<P>We protect information with measures such as encrypted passwords, secure connections and role-based access to organisation workspaces. We keep information only as long as needed for the purposes above and to meet legal, tax and accounting obligations, then delete or de-identify it. No system is completely secure, so please use a strong, unique password.</P>),
     },
     {
-      title: "7. Your choices and rights",
+      title: "7. Your choices and privacy rights",
       body: (<>
-        <P>You can ask to access or correct the personal information we hold about you, ask us to delete it where we are able to, or opt out of marketing messages. Contact us using the details below. We will respond within a reasonable time and may need to verify your identity first.</P>
-        <P>For information held by an organiser (for example, an event's attendee list), please contact that organiser directly.</P>
+        <P>You can ask to access or correct personal information we hold about you, and request deletion where we can do so while meeting legal, payment and record-keeping obligations. We may need to verify your identity. You can also change supporter communication preferences or use your browser’s cookie settings. See <a className="underline" href="/privacy-choices">Your privacy choices</a>.</P>
+        <P>For information an organiser controls about its event, campaign, members or supporters, contact that organiser. KutumbLink can help route a request where appropriate.</P>
       </>),
     },
     {
@@ -209,9 +214,25 @@ export const PRIVACY: LegalDoc = {
     {
       title: "10. Contact and complaints",
       body: (<>
-        <P>Email our privacy contact at <a className="underline" href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>. If you are not satisfied with our response, you can complain to the Office of the Australian Information Commissioner (OAIC) at oaic.gov.au.</P>
+        <P>Email our privacy contact at <a className="underline" href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>. If the Privacy Act applies and you are not satisfied with our response, you may contact the <a className="underline" href="https://www.oaic.gov.au/privacy/your-privacy-rights">Office of the Australian Information Commissioner</a>.</P>
       </>),
     },
+  ],
+};
+
+export const ORGANISER_TERMS: LegalDoc = {
+  title: "Organiser terms",
+  intro: "These terms apply when an organisation or its authorised team uses KutumbLink to publish events, campaigns, auctions, memberships or products, collect supporter information, send updates or receive payments. They supplement the general Terms of use.",
+  sections: [
+    { title: "1. Authority and accurate information", body: (<><P>You must be at least 18 and authorised to act for the organisation. Keep organisation, contact, banking, event and campaign information accurate and current, and tell us about material changes. We may request documents or other information to verify an organisation, its representatives or a payment instruction.</P><P>KutumbLink’s platform review is not ACNC registration, a fundraising licence, an endorsement or confirmation of deductible gift recipient status.</P></>) },
+    { title: "2. Fundraising and public claims", body: (<><P>You are responsible for having authority to fundraise and for complying with applicable Commonwealth, state and territory laws, permits and codes. Requirements vary by jurisdiction. Describe the purpose, beneficiary, use of funds, fees, conditions and any material limits clearly and truthfully.</P><P>Do not say a donation is tax deductible unless the recipient and gift qualify. A charity’s status alone does not make every donation deductible. Raffles and lottery-style fundraising are not available in this release.</P><P>Fundraising by charities is regulated across states and territories; check the regulator and requirements for every place where you solicit donations.</P></>) },
+    { title: "3. Events, goods and supporter services", body: (<><P>You are responsible for delivering each event, membership, product, auction item and other offer as described, including safety, accessibility, fulfilment, stock, customer service, cancellations and refunds. Publish clear prices, dates, eligibility rules, delivery details and refund terms before checkout.</P><P>Nothing in these terms excludes consumer guarantees or other rights that cannot be excluded under the Australian Consumer Law. If an event or offer is cancelled, materially changed, faulty or not supplied as promised, you must provide any remedy required by law.</P></>) },
+    { title: "4. Payments, fees and settlement", body: (<><P>KutumbLink platform access is currently priced at A$0 as shown on the Pricing page. Payment-provider fees, bank charges, taxes and any other charges disclosed at checkout may still apply. We may update platform pricing with notice.</P><P>Payments are processed by the provider shown in the relevant flow. You authorise us and the provider to process transactions, refunds and reversals needed to complete your instructions. Settlement timing depends on the payment flow, verification, provider processing, refunds, disputes and compliance checks. We may delay or withhold a transfer where reasonably necessary to investigate suspected fraud, meet legal obligations or cover a refund or chargeback.</P><P>You remain responsible for your own tax, accounting and reporting obligations. Keep complete records of receipts, fees, refunds and transfers.</P></>) },
+    { title: "5. Supporter information and communications", body: (<><P>Use attendee, donor and supporter information only for the event, donation, membership, fulfilment or other purpose explained when it was collected. Provide any notice required for your collection and obtain valid consent where required. Keep access limited to authorised people, protect the information and delete or de-identify it when no longer required.</P><P>Do not upload purchased, scraped or otherwise unauthorised contact lists. Before sending marketing email or SMS, ensure you have the required consent, identify the sender and provide a working unsubscribe method. Honour opt-outs promptly. Transactional messages should stay relevant to the person’s registration, payment or service.</P><P>KutumbLink’s Privacy and cookie policy describes how the platform handles personal information. You are responsible for your own privacy notice and practices as an organiser.</P></>) },
+    { title: "6. Account security and team roles", body: (<><P>Keep login links, passwords and payment credentials secure. Give team members only the access they need, remove access when they leave and promptly tell us about suspected misuse or a compromised account. You are responsible for actions taken by people using your organisation workspace.</P></>) },
+    { title: "7. Content and prohibited use", body: (<><P>You retain ownership of content you submit and give KutumbLink permission to host, display and promote it as needed to provide the service. You confirm that you have permission to use it and that it is accurate, lawful and not misleading.</P><P>You must not use the platform for fraud, unlawful fundraising, misleading claims, discrimination, harassment, unsafe events, unauthorised gaming, infringement of another person’s rights or interference with platform security. We may remove or pause content while we review a concern.</P></>) },
+    { title: "8. Suspension and termination", body: (<><P>We may restrict access, pause a listing or delay a transfer if information is incomplete, a payment is disputed, we receive a credible safety or fraud report, you breach these terms or action is needed to comply with law. Where appropriate, we will contact you and explain the next steps. You remain responsible for outstanding events, customer communications, refunds and records after access ends.</P></>) },
+    { title: "9. Australian law and contact", body: (<><P>These terms are governed by the laws of New South Wales, Australia, subject to any mandatory laws that apply elsewhere. The Australian Consumer Law continues to apply where relevant.</P><P>Contact us about these terms at <a className="underline" href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>. For state and territory fundraising rules, consult the relevant regulator; the <a className="underline" href="https://www.acnc.gov.au/for-charities/manage-your-charity/other-regulators/state-and-territory-regulators">ACNC regulator directory</a> links to jurisdiction-specific information.</P></>) },
   ],
 };
 

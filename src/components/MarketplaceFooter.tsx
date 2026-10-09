@@ -12,10 +12,12 @@ export default function MarketplaceFooter() {
           </Link>
           <p>Good events bring people together. We make it easier to find yours.</p>
         </div>
-        <div className="market-footer-links">
+        <nav className="market-footer-links" aria-label="Legal and privacy links">
+          <Link to="/privacy">Privacy and cookie policy</Link>
           <Link to="/terms">Terms of use</Link>
-          <Link to="/privacy">Privacy policy</Link>
-        </div>
+          <Link to="/organiser-terms">Organiser terms</Link>
+          <Link to="/privacy-choices">Your privacy choices</Link>
+        </nav>
         <span className="market-copyright">© {new Date().getFullYear()} KutumbLink</span>
       </div>
     </footer>
