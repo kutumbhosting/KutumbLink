@@ -1,0 +1,15 @@
+{
+  "name": "Kutumb Check-in",
+  "short_name": "Check-in",
+  "description": "Scan tickets and check in attendees at Kutumb events",
+  "start_url": "/checkin-app/",
+  "scope": "/checkin-app/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    { "src": "/kutumb-logo.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/kutumb-logo.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

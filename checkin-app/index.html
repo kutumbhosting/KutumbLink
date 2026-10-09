@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0f172a" />
+<!-- Makes it launch full-screen (no browser bar) once added to the home screen on iOS/Android -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Check-in" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="/kutumb-logo.png" />
+<title>Kutumb Check-in</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #0f172a;
+    color: #fff;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* ---- Login screen ---- */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  #login-card {
+    width: 100%;
+    max-width: 360px;
+    background: #fff;
+    color: #1e293b;
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  #login-card h1 { margin: 0; font-size: 24px; font-weight: 800; text-align: center; }
+  #login-card p.subtitle { margin: 0 0 8px; font-size: 14px; text-align: center; color: #64748b; }
+  #login-card input {
+    font-size: 16px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    outline: none;
+  }
+  #login-card button {
+    font-size: 17px;
+    font-weight: 700;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: none;
+    background: #ea580c;
+    color: #fff;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  #login-card button:disabled { opacity: 0.6; }
+  /* Password field with show/hide eye toggle */
+  #login-card .pw-wrap { position: relative; display: flex; }
+  #login-card .pw-wrap input { width: 100%; box-sizing: border-box; padding-right: 52px; }
+  #login-card button.eye-btn {
+    position: absolute; top: 0; right: 0; bottom: 0; width: 48px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0; background: transparent; color: #64748b; border: none; border-radius: 0 10px 10px 0;
+  }
+  #login-error { color: #dc2626; font-size: 13px; text-align: center; margin: 0; min-height: 16px; }
+
+  /* ---- Scan screen ---- */
+  #scan-screen { display: none; min-height: 100vh; flex-direction: column; }
+  #top-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 12px 16px; background: #1e293b; font-size: 13px;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  }
+  #top-bar span { opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #logout-btn {
+    background: transparent; border: 1px solid rgba(255,255,255,0.4); color: #fff;
+    border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+  }
+  #camera-wrap {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 16px; gap: 12px; position: relative;
+  }
+  #reader { width: 100%; max-width: 480px; border-radius: 12px; overflow: hidden; }
+  #hint, #camera-error { color: #cbd5e1; font-size: 14px; text-align: center; margin: 0; }
+  #camera-error { color: #f87171; display: none; }
+
+  #banner {
+    display: none;
+    position: fixed; inset: 0;
+    flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    padding: 24px; text-align: center;
+  }
+  #banner .line1 { font-size: 32px; font-weight: 800; }
+  #banner .line2 { font-size: 22px; font-weight: 600; opacity: 0.95; }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <form id="login-card">
+    <h1>Kutumb Check-in</h1>
+    <p class="subtitle">Sign in to start scanning tickets</p>
+    <input id="email" type="email" placeholder="Email" autocomplete="username" value="info@kutumb.org.au" required />
+    <div class="pw-wrap">
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" required />
+      <button id="toggle-password" class="eye-btn" type="button" aria-label="Show password" aria-pressed="false"></button>
+    </div>
+    <p id="login-error"></p>
+    <button id="login-btn" type="submit">Sign in</button>
+  </form>
+</div>
+
+<div id="scan-screen">
+  <div id="top-bar">
+    <span id="admin-name"></span>
+    <span id="count-text">Checked in: 0</span>
+    <button id="logout-btn">Log out</button>
+  </div>
+  <div id="camera-wrap">
+    <div id="reader"></div>
+    <p id="hint">Point the camera at the attendee's ticket QR code</p>
+    <p id="camera-error"></p>
+  </div>
+</div>
+
+<div id="banner">
+  <div class="line1" id="banner-line1"></div>
+  <div class="line2" id="banner-line2"></div>
+</div>
+
+<!-- Pinned to match the version already used elsewhere in the app (package.json) -->
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ── tiny fetch helper, same contract as the rest of the app's API ──────
+  async function api(path, options) {
+    options = options || {};
+    var headers = Object.assign({ "Content-Type": "application/json" }, options.headers || {});
+    var res = await fetch(path, Object.assign({}, options, { headers: headers, credentials: "same-origin" }));
+    var data = null;
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok) {
+      var err = new Error((data && data.message) || "Request failed");
+      throw err;
+    }
+    return data;
+  }
+
+  var loginScreen = document.getElementById("login-screen");
+  var scanScreen = document.getElementById("scan-screen");
+  var loginForm = document.getElementById("login-card");
+  var loginError = document.getElementById("login-error");
+  var loginBtn = document.getElementById("login-btn");
+  var adminNameEl = document.getElementById("admin-name");
+  var countTextEl = document.getElementById("count-text");
+  var cameraErrorEl = document.getElementById("camera-error");
+  var hintEl = document.getElementById("hint");
+  var banner = document.getElementById("banner");
+  var bannerLine1 = document.getElementById("banner-line1");
+  var bannerLine2 = document.getElementById("banner-line2");
+
+  var count = 0;
+  var busy = false;
+  var lastScan = { token: null, at: 0 };
+  var bannerTimer = null;
+  var html5QrCode = null;
+
+  function showScanScreen(adminName) {
+    loginScreen.style.display = "none";
+    scanScreen.style.display = "flex";
+    adminNameEl.textContent = adminName || "";
+    startCamera();
+  }
+
+  function showLoginScreen() {
+    scanScreen.style.display = "none";
+    loginScreen.style.display = "flex";
+    stopCamera();
+  }
+
+  function showBanner(kind, line1, line2) {
+    clearTimeout(bannerTimer);
+    banner.style.background = kind === "success" ? "#16a34a" : kind === "warning" ? "#d97706" : "#dc2626";
+    bannerLine1.textContent = line1;
+    bannerLine2.textContent = line2 || "";
+    banner.style.display = "flex";
+    hintEl.style.display = "none";
+    if (navigator.vibrate) navigator.vibrate(kind === "success" ? 120 : [80, 60, 80]);
+    bannerTimer = setTimeout(function () {
+      banner.style.display = "none";
+      hintEl.style.display = "block";
+    }, 2200);
+  }
+
+  async function handleDecodedToken(token) {
+    if (busy) return;
+    var now = Date.now();
+    // Ignore an immediate repeat read of the same still-visible QR code.
+    if (lastScan.token === token && now - lastScan.at < 2000) return;
+    lastScan = { token: token, at: now };
+
+    busy = true;
+    try {
+      var result = await api("/api/checkin/scan", {
+        method: "POST",
+        body: JSON.stringify({ qrToken: token }),
+      });
+      var name = (result.attendee && (result.attendee.name || result.attendee.email)) || "Attendee";
+      var eventName = (result.attendee && result.attendee.event_name) || "";
+      showBanner("success", "✅ Checked in", eventName ? name + " — " + eventName : name);
+      count += 1;
+      countTextEl.textContent = "Checked in: " + count;
+    } catch (err) {
+      var msg = (err && err.message) || "";
+      if (/already checked in/i.test(msg)) {
+        showBanner("warning", "⚠️ Already checked in", "");
+      } else if (/no ticket|not found/i.test(msg)) {
+        showBanner("error", "❌ Ticket not recognised", "");
+      } else {
+        showBanner("error", "❌ " + (msg || "Scan failed"), "");
+      }
+    } finally {
+      setTimeout(function () { busy = false; }, 1500);
+    }
+  }
+
+  function startCamera() {
+    cameraErrorEl.style.display = "none";
+    if (typeof Html5Qrcode === "undefined") {
+      cameraErrorEl.textContent = "Scanner library failed to load — check your internet connection and reload.";
+      cameraErrorEl.style.display = "block";
+      return;
+    }
+    html5QrCode = new Html5Qrcode("reader");
+    html5QrCode
+      .start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 260 },
+        function (decodedText) { handleDecodedToken(decodedText); },
+        function () {} // per-frame "no QR found" noise, ignored
+      )
+      .catch(function (err) {
+        cameraErrorEl.textContent =
+          (err && err.message ? err.message : "Could not access the camera") +
+          ". Please allow camera access in your browser settings and reload this page.";
+        cameraErrorEl.style.display = "block";
+      });
+  }
+
+  function stopCamera() {
+    if (html5QrCode) {
+      html5QrCode.stop().then(function () { html5QrCode.clear(); }).catch(function () {});
+      html5QrCode = null;
+    }
+  }
+
+  // ── Show / hide password toggle ──
+  var EYE_OPEN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var EYE_OFF = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>';
+  var pwInput = document.getElementById("password");
+  var pwToggle = document.getElementById("toggle-password");
+  function setPwVisible(visible) {
+    pwInput.type = visible ? "text" : "password";
+    pwToggle.innerHTML = visible ? EYE_OFF : EYE_OPEN;
+    pwToggle.setAttribute("aria-label", visible ? "Hide password" : "Show password");
+    pwToggle.setAttribute("aria-pressed", visible ? "true" : "false");
+  }
+  setPwVisible(false);
+  pwToggle.addEventListener("click", function () { setPwVisible(pwInput.type === "password"); });
+
+  loginForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    loginError.textContent = "";
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Signing in…";
+    try {
+      var email = document.getElementById("email").value;
+      var password = document.getElementById("password").value;
+      var data = await api("/api/admin-auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email: email, password: password }),
+      });
+      showScanScreen((data.admin && (data.admin.name || data.admin.email)) || "");
+    } catch (err) {
+      loginError.textContent = (err && err.message) || "Invalid email or password";
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Sign in";
+    }
+  });
+
+  document.getElementById("logout-btn").addEventListener("click", async function () {
+    try { await api("/api/admin-auth/logout", { method: "POST" }); } catch (e) {}
+    count = 0;
+    countTextEl.textContent = "Checked in: 0";
+    document.getElementById("email").value = "info@kutumb.org.au";
+    pwInput.value = "";
+    setPwVisible(false);
+    showLoginScreen();
+  });
+
+  // ── Resume an existing session (so re-opening the app doesn't ask to log in again) ──
+  api("/api/admin-auth/me")
+    .then(function (admin) { showScanScreen(admin.name || admin.email); })
+    .catch(function () { /* not logged in — login screen is already showing */ });
+
+  // ── Register the service worker so the app shell opens instantly next time ──
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
