@@ -67,6 +67,9 @@ import { importMembersDropIn } from "./lib/importMembersDropIn.js";
 import { generateEmailDraft } from "./lib/aiDraft.js";
 
 const app = express();
+const reverseGeocodeCache = new Map();
+let reverseGeocodeQueue = Promise.resolve();
+let nextReverseGeocodeAt = 0;
 
 app.use(cors());
 
@@ -1415,6 +1418,47 @@ app.post("/api/members/update", requireSuperAdmin, async (req, res) => {
 /* -----------------------------
    ✅ UPCOMING EVENTS
 ------------------------------ */
+app.get("/api/location-provider/reverse", async (req, res) => {
+  const lat = Number(req.query.lat);
+  const lon = Number(req.query.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+    return res.status(400).json({ message: "A valid location is required." });
+  }
+  const cacheKey = `${lat.toFixed(3)},${lon.toFixed(3)}`;
+  const cached = reverseGeocodeCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) return res.json(cached.result);
+
+  const lookup = reverseGeocodeQueue.then(async () => {
+    const delay = Math.max(0, nextReverseGeocodeAt - Date.now());
+    if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+    nextReverseGeocodeAt = Date.now() + 1000;
+    const provider = process.env.GEOCODING_REVERSE_URL || "https://nominatim.openstreetmap.org/reverse";
+    const url = new URL(provider);
+    url.search = new URLSearchParams({ format: "jsonv2", lat: String(lat), lon: String(lon), zoom: "10", addressdetails: "1" }).toString();
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        "User-Agent": `KutumbLink/1.0 (${process.env.LEGAL_CONTACT_EMAIL || "support@kutumblink.com.au"})`,
+        Referer: process.env.PUBLIC_BASE_URL || "https://kutumblink.com.au/",
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!response.ok) throw new Error(`Reverse geocoder responded ${response.status}`);
+    const result = await response.json();
+    reverseGeocodeCache.set(cacheKey, { result, expiresAt: Date.now() + 5 * 60 * 1000 });
+    if (reverseGeocodeCache.size > 2000) reverseGeocodeCache.delete(reverseGeocodeCache.keys().next().value);
+    return result;
+  });
+  reverseGeocodeQueue = lookup.then(() => undefined, () => undefined);
+  try {
+    const result = await lookup;
+    res.set("Cache-Control", "private, max-age=300").json(result);
+  } catch (error) {
+    console.error("Location lookup failed:", error.message);
+    res.status(502).json({ message: "Location lookup is temporarily unavailable." });
+  }
+});
+
 app.get("/api/upcoming-events", async (req, res) => {
   try {
     await archiveExpiredUpcomingEvents();
