@@ -1,0 +1,3 @@
+﻿organisation_id,name,slug,description,amount,billing_interval,status
+2,Community Friend Monthly Test,community-friend-monthly-test,Fictional monthly membership tier for sandbox testing.,10.00,month,published
+2,Community Friend Annual Test,community-friend-annual-test,Fictional annual membership tier for sandbox testing.,100.00,year,published

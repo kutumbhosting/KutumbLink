@@ -1,0 +1,2 @@
+﻿organisation_id,name,slug,description,price,stock_on_hand,requires_shipping,shipping_fee,status
+2,Community Garden Tote Test,community-garden-tote-test,Fictional merchandise listing for sandbox checkout and stock tests.,18.00,20,false,0.00,published

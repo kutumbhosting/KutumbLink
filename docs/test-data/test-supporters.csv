@@ -1,0 +1,3 @@
+﻿organisation_id,display_name,email,phone,source,email_opt_out,sms_opt_out,email_consent,sms_consent,consent_source
+2,Alex Example Opted In,alex.example@example.org,,platform_test,false,false,true,false,test_fixture
+2,Jordan Example Opted Out,jordan.example@example.org,,platform_test,true,true,false,false,test_fixture

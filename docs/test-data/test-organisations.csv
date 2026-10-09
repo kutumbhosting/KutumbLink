@@ -1,0 +1,2 @@
+﻿legal_name,slug,public_name,description,causes,contact_email,contact_phone,website,address_line1,suburb,state,postcode,country,verification_status,public_profile_enabled,is_active
+Harbour Neighbourhood Support Test Association,harbour-neighbourhood-test,Harbour Neighbourhood Support Test,Fictional organisation used only for KutumbLink staging tests.,"[""Community wellbeing"",""Youth""]",test-contact@example.org,,https://example.org,1 Test Street,Sydney,NSW,2000,Australia,draft,false,true

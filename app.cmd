@@ -96,7 +96,11 @@ call npm run build
 if errorlevel 1 goto BUILD_FAILED
 
 :AFTER_BUILD
-if "%PORT%"=="" set PORT=8080
+if "%PORT%"=="" set "PORT=8080"
+set "REQUESTED_PORT=%PORT%"
+for /f "usebackq delims=" %%P in (`powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\find-free-port.ps1" -StartPort %REQUESTED_PORT%`) do set "PORT=%%P"
+if "%PORT%"=="" goto NO_FREE_PORT
+if not "%PORT%"=="%REQUESTED_PORT%" echo [INFO] Port %REQUESTED_PORT% is already in use; starting this package on port %PORT% instead.
 echo.
 echo ============================================
 echo   Starting KutumbLink at http://localhost:%PORT%
@@ -143,6 +147,11 @@ goto FAIL
 :SERVER_FAILED
 echo [ERROR] KutumbLink stopped because the server exited with an error.
 echo The server error is shown above. Take a screenshot or copy the last 30 lines before closing.
+goto FAIL
+
+:NO_FREE_PORT
+echo [ERROR] No free port was found between the selected port and port 8199.
+echo Close the other local server or set PORT to a free port, then run app.cmd again.
 goto FAIL
 
 :FAIL

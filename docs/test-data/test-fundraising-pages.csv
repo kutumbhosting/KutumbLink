@@ -1,0 +1,2 @@
+﻿organisation_id,campaign_id,event_id,supporter_id,team_id,display_name,contact_email,title,story,slug,goal_amount,status
+2,1,,,,Taylor Example,taylor.example@example.org,Taylor's Community Walk Test,Fictional supporter page for testing a peer-to-peer campaign.,taylor-community-walk-test,300.00,published

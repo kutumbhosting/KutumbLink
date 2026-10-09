@@ -1,0 +1,2 @@
+﻿organisation_id,title,description,goal_amount,currency,fundraising_url,status,slug,story,image_url,internal_giving_enabled,starts_at,ends_at
+2,Community Garden Test Appeal,A fictional appeal for exercising campaign pages and AUD donation checkout in a payment sandbox.,2500.00,AUD,,published,community-garden-test-appeal,Test fixture only. Do not treat this as a real charitable appeal.,,true,2026-10-09T00:00:00+11:00,2026-12-31T23:59:00+11:00

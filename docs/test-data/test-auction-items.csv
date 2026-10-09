@@ -1,0 +1,2 @@
+﻿organisation_id,event_id,title,description,starting_bid,minimum_increment,starts_at,ends_at,status
+2,1,Community Art Print Test Item,Fictional item for sandbox bidding tests only.,25.00,5.00,2026-10-10T09:00:00+11:00,2026-11-14T20:00:00+11:00,open

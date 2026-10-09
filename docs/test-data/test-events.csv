@@ -1,0 +1,2 @@
+﻿organisation_id,title,date_text,time_text,location,capacity,member_fee,non_member_fee,description,is_active,published
+2,Harbour Community Walk Test,2026-11-15,10:00 AM,"Test Park, Sydney NSW",100,0.00,0.00,Fictional event for testing the KutumbLink event and auction flows.,true,true
