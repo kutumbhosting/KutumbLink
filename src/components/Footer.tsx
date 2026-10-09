@@ -240,15 +240,15 @@ const Footer = () => {
               <span className="text-border">|</span>
               <Link to="/privacy-choices" onClick={() => window.scrollTo(0, 0)} className="hover:text-primary transition-colors">Your privacy choices</Link>
             </div>
-<p>
-  Website developed by{" "}
+<p className="text-right md:ml-auto">
+  Developed by{" "}
   <a
     href="https://www.prama-ai.com"
     target="_blank"
     rel="noopener noreferrer"
     className="text-primary font-semibold hover:underline"
   >
-    Prama AI, Australia
+    Prama AI
   </a>
 </p>
           </div>
@@ -311,6 +311,5 @@ const Footer = () => {
 };
 
 export default Footer;
-
 
 

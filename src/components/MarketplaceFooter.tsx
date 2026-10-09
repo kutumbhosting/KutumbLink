@@ -18,7 +18,10 @@ export default function MarketplaceFooter() {
           <Link to="/organiser-terms">Organiser terms</Link>
           <Link to="/privacy-choices">Your privacy choices</Link>
         </nav>
-        <span className="market-copyright">© {new Date().getFullYear()} KutumbLink</span>
+        <div className="market-footer-meta">
+          <span className="market-copyright">© {new Date().getFullYear()} KutumbLink</span>
+          <a className="market-footer-credit" href="https://www.prama-ai.com" target="_blank" rel="noopener noreferrer">Developed by Prama AI</a>
+        </div>
       </div>
     </footer>
   );
