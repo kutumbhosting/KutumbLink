@@ -246,7 +246,7 @@ const Footer = () => {
     href="https://www.prama-ai.com"
     target="_blank"
     rel="noopener noreferrer"
-    className="text-primary font-semibold hover:underline"
+    className="text-[#67b9e8] font-semibold hover:underline"
   >
     Prama AI
   </a>
@@ -311,5 +311,4 @@ const Footer = () => {
 };
 
 export default Footer;
-
 

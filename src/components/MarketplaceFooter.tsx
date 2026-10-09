@@ -20,7 +20,7 @@ export default function MarketplaceFooter() {
         </nav>
         <div className="market-footer-meta">
           <span className="market-copyright">© {new Date().getFullYear()} KutumbLink</span>
-          <a className="market-footer-credit" href="https://www.prama-ai.com" target="_blank" rel="noopener noreferrer">Developed by Prama AI</a>
+          <span className="market-footer-credit">Developed by <a href="https://www.prama-ai.com" target="_blank" rel="noopener noreferrer">Prama AI</a></span>
         </div>
       </div>
     </footer>
