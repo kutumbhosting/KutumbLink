@@ -26,6 +26,8 @@ import SupporterPortal from "./pages/SupporterPortal";
 import CharityJoin from "./pages/CharityJoin";
 import TermsOfUse from "./pages/legal/TermsOfUse";
 import PrivacyPolicyPage from "./pages/legal/PrivacyPolicyPage";
+import OrganiserTermsPage from "./pages/legal/OrganiserTermsPage";
+import PrivacyChoices from "./pages/legal/PrivacyChoices";
 import CharityDiscovery from "./pages/CharityDiscovery";
 import CommunityOpportunities from "./pages/CommunityOpportunities";
 import Pricing from "./pages/Pricing";
@@ -87,6 +89,8 @@ const App = () => (
         {/* ✅ LEGAL CENTRE ROUTES */}
         <Route path="/terms" element={<TermsOfUse />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/organiser-terms" element={<OrganiserTermsPage />} />
+        <Route path="/privacy-choices" element={<PrivacyChoices />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/event-terms" element={<EventTerms />} />
         <Route path="/checkout/return" element={<CheckoutReturn />} />

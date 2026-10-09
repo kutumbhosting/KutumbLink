@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowRight, ArrowUpRight, CalendarDays, HeartHandshake, MapPin, Search, Sparkles, Ticket } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CalendarDays, HeartHandshake, LoaderCircle, MapPin, Search, Sparkles, Ticket } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import MarketplaceHeader from "@/components/MarketplaceHeader";
 import MarketplaceFooter from "@/components/MarketplaceFooter";
@@ -15,7 +15,10 @@ export default function MarketplaceHome() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [search, setSearch] = useState("");
-  const [place, setPlace] = useState("");
+  const [place, setPlace] = useState("Sydney");
+  const [locationBusy, setLocationBusy] = useState(false);
+  const [locationMessage, setLocationMessage] = useState("");
+  const [locationAttribution, setLocationAttribution] = useState(false);
 
   const loadEvents = () => {
     setLoading(true);
@@ -28,6 +31,49 @@ export default function MarketplaceHome() {
 
   useEffect(loadEvents, []);
 
+  const useMyLocation = () => {
+    setLocationMessage("");
+    setLocationAttribution(false);
+    if (!window.isSecureContext) {
+      setLocationMessage("Your browser only shares location on a secure connection. Open KutumbLink on HTTPS or localhost, then try again.");
+      return;
+    }
+    if (!navigator.geolocation) {
+      setLocationMessage("Location services are not available in this browser. Enter a city or postcode instead.");
+      return;
+    }
+    setLocationBusy(true);
+    navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+      try {
+        // This user-initiated reverse lookup turns the device position into a
+        // searchable suburb/city. Coordinates are not stored by KutumbLink.
+        const query = new URLSearchParams({ lat: String(coords.latitude), lon: String(coords.longitude) });
+        const response = await fetch(`/api/location-provider/reverse?${query}`);
+        if (!response.ok) throw new Error("Location lookup failed");
+        const result = await response.json();
+        setLocationAttribution(true);
+        const address = result.address || {};
+        const locality = address.suburb || address.city_district || address.city || address.town || address.village || address.county || address.state;
+        if (!locality) throw new Error("No nearby city was returned");
+        setPlace([locality, address.state].filter((value, index, list) => value && list.indexOf(value) === index).join(", "));
+        setLocationMessage("Location set. Nearby events are matched using their published location.");
+      } catch {
+        setLocationMessage("We couldn't identify your area. Enter a city or postcode instead.");
+      } finally {
+        setLocationBusy(false);
+      }
+    }, (error) => {
+      setLocationBusy(false);
+      if (error.code === error.PERMISSION_DENIED) {
+        setLocationMessage("Location permission is blocked for this site. Allow Location in your browser’s site settings, then try again.");
+      } else if (error.code === error.POSITION_UNAVAILABLE) {
+        setLocationMessage("Your device couldn’t determine its location. Turn on device location services and try again.");
+      } else {
+        setLocationMessage("Getting your location took too long. Check device location services and try again.");
+      }
+    }, { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 });
+  };
+
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
     const params = new URLSearchParams();
@@ -38,6 +84,22 @@ export default function MarketplaceHome() {
   };
 
   const featured = events[0];
+  const locationTerms = place.split(",").map((part) => part.trim().toLocaleLowerCase()).filter((part) => part.length > 2);
+  const localEvents = locationTerms.length
+    ? events.filter((event) => locationTerms.some((term) => event.location?.toLocaleLowerCase().includes(term)))
+    : events;
+  const trending = [...events]
+    .filter((event) => event.isActive && event.published !== false)
+    .sort((a, b) => {
+      const engagement = (event: PlatformEvent) => {
+        const registrations = Math.max(0, Number(event.registrationsCount) || 0);
+        const capacity = Math.max(0, Number(event.capacity) || 0);
+        const fill = capacity ? Math.min(registrations / capacity, 1) : 0;
+        return Math.log1p(registrations) * 3 + fill * 2;
+      };
+      return engagement(b) - engagement(a);
+    })
+    .slice(0, 6);
 
   return (
     <div className="marketplace-app">
@@ -64,6 +126,14 @@ export default function MarketplaceHome() {
                 </label>
                 <button className="market-search-button" type="submit" aria-label="Search events"><Search size={19} /><span>Search</span></button>
               </form>
+              <div className="market-location-current">
+                <span>Showing events in <strong>{place || "Sydney"}</strong></span>
+                <button type="button" onClick={useMyLocation} disabled={locationBusy} aria-label="Use my location">
+                  {locationBusy ? <LoaderCircle size={15} className="market-location-spinner" /> : <MapPin size={15} />}
+                  {locationBusy ? "Finding location…" : "Use my location"}
+                </button>
+              </div>
+              {locationMessage && <p className="market-location-message" role="status">{locationMessage}{locationAttribution && <> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap</a></>}</p>}
               <div className="market-popular-searches">
                 <span>Popular:</span>
                 {categories.slice(0, 3).map((category) => <button key={category} onClick={() => navigate(`/events?q=${encodeURIComponent(category)}`)}>{category}</button>)}
@@ -91,6 +161,17 @@ export default function MarketplaceHome() {
           <div className="market-hero-bottomline"><span>Make plans. Make connections. Make a difference.</span><span>EXPLORE WHAT'S ON <ArrowRight size={14} /></span></div>
         </section>
 
+        <section className="market-trending-section" aria-labelledby="market-trending-title">
+          <div className="market-section-heading"><div><span className="market-kicker">COMMUNITY FAVOURITES</span><h2 id="market-trending-title">Trending events</h2><p>Popular upcoming events, ranked by registrations and capacity filled.</p></div><Link to="/events" className="market-text-link">Explore all <ArrowUpRight size={16} /></Link></div>
+          {loading ? <div className="event-card-grid">{[0, 1, 2].map((n) => <div className="event-card-skeleton" key={n}><div /><span /><span /><span /></div>)}</div> : loadError ? <div className="market-empty-state"><p>{loadError}</p></div> : trending.length ? (
+            <div className="market-trending-marquee" role="region" aria-label="Trending upcoming events; animation pauses on hover or keyboard focus">
+              <div className="market-trending-track">
+                {[...trending, ...trending].map((event, index) => <div className="market-trending-item" key={`${event.title}-${index}`} aria-hidden={index >= trending.length} inert={index >= trending.length}><EventCard event={event} index={index} /></div>)}
+              </div>
+            </div>
+          ) : <div className="market-empty-state"><h3>Trending events will appear here</h3><p>As people register for published events, the most popular upcoming events will be featured.</p></div>}
+        </section>
+
         <section className="market-category-section">
           <div className="market-section-heading"><div><span className="market-kicker">A LITTLE BIT OF EVERYTHING</span><h2>What are you into?</h2></div><Link to="/events" className="market-text-link">Explore all <ArrowUpRight size={16} /></Link></div>
           <div className="market-category-row">
@@ -107,10 +188,10 @@ export default function MarketplaceHome() {
           <div className="market-section-heading"><div><span className="market-kicker">YOUR NEXT STORY STARTS HERE</span><h2>Coming up near you</h2></div><Link to="/events" className="market-text-link">See all events <ArrowUpRight size={16} /></Link></div>
           {loading ? <div className="event-card-grid">{[0, 1, 2].map((n) => <div className="event-card-skeleton" key={n}><div /><span /><span /><span /></div>)}</div> : loadError ? (
             <div className="market-empty-state"><p>{loadError}</p><button className="market-inline-button" onClick={loadEvents}>Try again</button></div>
-          ) : events.length ? (
-            <div className="event-card-grid">{events.slice(0, 3).map((event, index) => <EventCard key={event.title} event={event} index={index} />)}</div>
+          ) : localEvents.length ? (
+            <div className="event-card-grid">{localEvents.slice(0, 3).map((event, index) => <EventCard key={event.title} event={event} index={index} />)}</div>
           ) : (
-            <div className="market-empty-state"><span className="empty-sparkle">✳</span><h3>Something good is on its way</h3><p>There aren't any events listed yet. Check back soon or explore what organisers can create.</p><Link to="/host" className="market-outline-button">For event organisers <ArrowRight size={16} /></Link></div>
+            <div className="market-empty-state"><span className="empty-sparkle">✳</span><h3>No events found in {place || "your area"} yet</h3><p>Try another city or browse all published events.</p><Link to="/events" className="market-outline-button">Explore all events <ArrowRight size={16} /></Link></div>
           )}
         </section>
 
